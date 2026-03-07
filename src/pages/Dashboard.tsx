@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, BarChart, Bar
+  PieChart, Pie, Cell
 } from 'recharts'
 import {
   DollarSign, TrendingUp, TrendingDown, ShieldCheck,
@@ -16,11 +16,15 @@ import Header from '../components/layout/Header'
 import { useLiveData } from '../hooks/useLiveData'
 import { PORTFOLIO_TOKENS, PORTFOLIO_HISTORY, DEFI_POSITIONS, TOKEN_APPROVALS, RISK_METRICS } from '../data/mockData'
 import { calculatePortfolioValue, calculateRiskScore, getOverallRiskLevel } from '../utils/riskCalculations'
-import { formatCurrency, formatPercent, getRiskBg } from '../utils/formatters'
+import { formatCurrency, formatPercent } from '../utils/formatters'
 
 const CHAIN_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#ef4444', '#f97316']
 
-const CustomTooltip = ({ active, payload, label }) => {
+interface ChartTooltipPayload {
+  value: number
+}
+
+function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: ChartTooltipPayload[]; label?: string }) {
   if (!active || !payload?.length) return null
   return (
     <div className="glass-card rounded-lg p-3 text-xs">
@@ -38,7 +42,7 @@ export default function Dashboard() {
   const riskInfo = useMemo(() => getOverallRiskLevel(riskScore), [riskScore])
 
   const chainAllocation = useMemo(() => {
-    const chains = {}
+    const chains: Record<string, number> = {}
     liveTokens.forEach(t => {
       chains[t.chain] = (chains[t.chain] || 0) + t.allocation
     })
@@ -46,8 +50,7 @@ export default function Dashboard() {
   }, [liveTokens])
 
   const totalChange = useMemo(() => {
-    const weightedChange = liveTokens.reduce((sum, t) => sum + t.change24h * (t.allocation / 100), 0)
-    return weightedChange
+    return liveTokens.reduce((sum, t) => sum + t.change24h * (t.allocation / 100), 0)
   }, [liveTokens])
 
   const defiTotal = DEFI_POSITIONS.reduce((s, p) => s + p.supplied, 0)
@@ -122,7 +125,7 @@ export default function Dashboard() {
                     </linearGradient>
                   </defs>
                   <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} interval={14} />
-                  <YAxis tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} tickFormatter={v => `$${(v/1000).toFixed(0)}K`} />
+                  <YAxis tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} tickFormatter={(v: number) => `$${(v/1000).toFixed(0)}K`} />
                   <Tooltip content={<CustomTooltip />} />
                   <Area type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} fill="url(#portfolioGrad)" />
                 </AreaChart>

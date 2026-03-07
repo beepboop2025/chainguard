@@ -1,26 +1,29 @@
-// Centralized connection state for all data feeds
-const feedStatus = {
-  prices_ws: 'disconnected',  // 'connected' | 'reconnecting' | 'disconnected'
-  prices_rest: 'unknown',     // 'live' | 'cached' | 'error'
+import type { FeedName, FeedStatusValue, FeedStatusMap, OverallStatus } from '../types'
+
+type FeedStatusCallback = (status: FeedStatusMap) => void
+
+const feedStatus: FeedStatusMap = {
+  prices_ws: 'disconnected',
+  prices_rest: 'unknown',
   gas: 'unknown',
   whales: 'unknown',
   threats: 'unknown',
   defi: 'unknown',
 }
 
-const listeners = new Set()
+const listeners = new Set<FeedStatusCallback>()
 
-export function updateFeedStatus(feed, status) {
+export function updateFeedStatus(feed: FeedName, status: FeedStatusValue): void {
   if (feedStatus[feed] === status) return
   feedStatus[feed] = status
   listeners.forEach(fn => fn({ ...feedStatus }))
 }
 
-export function getFeedStatus() {
+export function getFeedStatus(): FeedStatusMap {
   return { ...feedStatus }
 }
 
-export function getOverallStatus() {
+export function getOverallStatus(): OverallStatus {
   const values = Object.values(feedStatus)
   const liveCount = values.filter(v => v === 'connected' || v === 'live').length
   if (liveCount >= 3) return 'live'
@@ -30,9 +33,8 @@ export function getOverallStatus() {
   return 'offline'
 }
 
-export function subscribe(callback) {
+export function subscribe(callback: FeedStatusCallback): () => void {
   listeners.add(callback)
-  // Immediately emit current state
   callback({ ...feedStatus })
-  return () => listeners.delete(callback)
+  return () => { listeners.delete(callback) }
 }

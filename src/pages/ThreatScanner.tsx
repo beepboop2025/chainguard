@@ -1,18 +1,19 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  AlertTriangle, Shield, Search, ExternalLink, Ban,
-  CheckCircle, XCircle, Eye, ChevronDown, ChevronUp
+  AlertTriangle, Shield, Search, Ban,
+  CheckCircle, XCircle, ChevronDown, ChevronUp
 } from 'lucide-react'
 import Card from '../components/common/Card'
 import StatCard from '../components/common/StatCard'
 import Badge from '../components/common/Badge'
 import Header from '../components/layout/Header'
-import { THREAT_TOKENS, CHAINS } from '../data/mockData'
+import { THREAT_TOKENS } from '../data/mockData'
 import { scanToken, detectChainId } from '../services/threatService'
+import type { ScoreBarProps, ScanResult } from '../types'
 
-function ScoreBar({ score }) {
-  const getColor = (s) => {
+function ScoreBar({ score }: ScoreBarProps) {
+  const getColor = (s: number): string => {
     if (s >= 80) return 'bg-red-500'
     if (s >= 60) return 'bg-orange-500'
     if (s >= 40) return 'bg-amber-500'
@@ -39,9 +40,9 @@ function ScoreBar({ score }) {
 }
 
 export default function ThreatScanner() {
-  const [expanded, setExpanded] = useState(null)
+  const [expanded, setExpanded] = useState<number | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
-  const [scanResult, setScanResult] = useState(null)
+  const [scanResult, setScanResult] = useState<ScanResult | null>(null)
   const [scanning, setScanning] = useState(false)
 
   const handleScan = async () => {

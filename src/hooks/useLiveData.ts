@@ -2,11 +2,11 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { connectPriceWebSocket, fetchTokenDetails } from '../services/priceService'
 import { fetchAllChainGas } from '../services/gasService'
 import { fetchRecentWhaleMovements } from '../services/whaleService'
-import { COINGECKO_IDS } from '../services/apiConfig'
+import type { PortfolioToken, GasDataRecord, WhaleMovement, Impact } from '../types'
 
 // Real-time token prices via CoinCap WebSocket + CoinGecko REST for 24h change
-export function useLiveData(initialData, interval = 3000) {
-  const [data, setData] = useState(initialData)
+export function useLiveData(initialData: PortfolioToken[], _interval = 3000): PortfolioToken[] {
+  const [data, setData] = useState<PortfolioToken[]>(initialData)
   const latestEthPrice = useRef(initialData.find(t => t.symbol === 'ETH')?.price ?? 3800)
 
   useEffect(() => {
@@ -51,8 +51,8 @@ export function useLiveData(initialData, interval = 3000) {
 }
 
 // Real gas prices from Owlracle, polling every 15s
-export function useLiveGas(initialData, interval = 5000) {
-  const [data, setData] = useState(initialData)
+export function useLiveGas(initialData: GasDataRecord, interval = 5000): GasDataRecord {
+  const [data, setData] = useState<GasDataRecord>(initialData)
 
   useEffect(() => {
     const fetchGas = async () => {
@@ -73,16 +73,16 @@ export function useLiveGas(initialData, interval = 5000) {
 }
 
 // Whale movements: real API data blended with simulated movements
-export function useLiveWhale(initialData, interval = 8000) {
-  const [data, setData] = useState(initialData)
+export function useLiveWhale(initialData: WhaleMovement[], interval = 8000): WhaleMovement[] {
+  const [data, setData] = useState<WhaleMovement[]>(initialData)
 
   const tokens = ['ETH', 'BTC', 'SOL', 'ARB', 'LINK', 'AAVE', 'UNI', 'AVAX']
   const actions = ['Bought', 'Sold', 'Transferred', 'Deposited', 'Withdrawn']
-  const impacts = ['bullish', 'bearish', 'neutral']
+  const impacts: Impact[] = ['bullish', 'bearish', 'neutral']
   const chains = ['ethereum', 'solana', 'arbitrum', 'base', 'polygon']
 
   // Keep simulated generator as fallback / filler between real data
-  const generateMovement = useCallback(() => {
+  const generateMovement = useCallback((): WhaleMovement => {
     const token = tokens[Math.floor(Math.random() * tokens.length)]
     const action = actions[Math.floor(Math.random() * actions.length)]
     const value = Math.round(Math.random() * 50 + 5)
@@ -101,14 +101,11 @@ export function useLiveWhale(initialData, interval = 8000) {
   }, [])
 
   useEffect(() => {
-    let realDataFetched = false
-
     // Fetch real whale data on mount and every 60s
     const fetchWhales = async () => {
       try {
         const movements = await fetchRecentWhaleMovements()
         if (movements.length > 0) {
-          realDataFetched = true
           setData(prev => {
             // Deduplicate: don't add entries that already exist
             const existing = new Set(prev.map(p => `${p.wallet}-${p.token}-${p.value}`))

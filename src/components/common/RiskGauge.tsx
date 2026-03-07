@@ -1,18 +1,19 @@
 import { motion } from 'framer-motion'
+import type { RiskGaugeProps } from '../../types'
 
-export default function RiskGauge({ score, size = 140 }) {
+export default function RiskGauge({ score, size = 140 }: RiskGaugeProps) {
   const radius = (size - 20) / 2
   const circumference = Math.PI * radius
   const offset = circumference - (score / 100) * circumference
 
-  const getColor = (s) => {
+  const getColor = (s: number): string => {
     if (s >= 80) return '#10b981'
     if (s >= 60) return '#f59e0b'
     if (s >= 40) return '#f97316'
     return '#ef4444'
   }
 
-  const getLabel = (s) => {
+  const getLabel = (s: number): string => {
     if (s >= 80) return 'Safe'
     if (s >= 60) return 'Moderate'
     if (s >= 40) return 'Risky'

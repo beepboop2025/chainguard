@@ -1,6 +1,10 @@
-// Simulated real-time data for the DeFi Risk Intelligence platform
+import type {
+  Chain, PortfolioToken, DefiPosition, TokenApproval,
+  WhaleMovement, ThreatToken, PortfolioHistoryEntry,
+  GasHistoryEntry, RiskMetrics, GasDataRecord,
+} from '../types'
 
-export const CHAINS = {
+export const CHAINS: Record<string, Chain> = {
   ethereum: { name: 'Ethereum', symbol: 'ETH', color: '#627EEA', icon: '⟠' },
   bsc: { name: 'BNB Chain', symbol: 'BNB', color: '#F3BA2F', icon: '◆' },
   polygon: { name: 'Polygon', symbol: 'MATIC', color: '#8247E5', icon: '⬡' },
@@ -10,7 +14,7 @@ export const CHAINS = {
   avalanche: { name: 'Avalanche', symbol: 'AVAX', color: '#E84142', icon: '▲' },
 }
 
-export const PORTFOLIO_TOKENS = [
+export const PORTFOLIO_TOKENS: PortfolioToken[] = [
   { symbol: 'ETH', name: 'Ethereum', chain: 'ethereum', balance: 12.45, price: 3842.50, change24h: 2.34, allocation: 35.2 },
   { symbol: 'BTC', name: 'Bitcoin', chain: 'ethereum', balance: 0.85, price: 98420.00, change24h: 1.12, allocation: 25.8 },
   { symbol: 'SOL', name: 'Solana', chain: 'solana', balance: 145.3, price: 187.20, change24h: -3.45, allocation: 10.1 },
@@ -23,7 +27,7 @@ export const PORTFOLIO_TOKENS = [
   { symbol: 'OP', name: 'Optimism', chain: 'ethereum', balance: 2200, price: 2.15, change24h: -2.10, allocation: 1.0 },
 ]
 
-export const DEFI_POSITIONS = [
+export const DEFI_POSITIONS: DefiPosition[] = [
   { protocol: 'Aave V3', chain: 'ethereum', type: 'Lending', supplied: 45000, borrowed: 18000, healthFactor: 1.82, apy: 3.2, risk: 'low' },
   { protocol: 'Uniswap V3', chain: 'ethereum', type: 'LP', supplied: 22000, borrowed: 0, healthFactor: null, apy: 18.5, risk: 'medium', ilLoss: -2.3 },
   { protocol: 'GMX', chain: 'arbitrum', type: 'Perps', supplied: 15000, borrowed: 0, healthFactor: null, apy: 12.4, risk: 'high', leverage: '3x' },
@@ -32,7 +36,7 @@ export const DEFI_POSITIONS = [
   { protocol: 'Compound V3', chain: 'base', type: 'Lending', supplied: 8000, borrowed: 3500, healthFactor: 2.15, apy: 4.1, risk: 'low' },
 ]
 
-export const TOKEN_APPROVALS = [
+export const TOKEN_APPROVALS: TokenApproval[] = [
   { token: 'USDC', spender: 'Uniswap V3 Router', spenderAddr: '0x68b3...f4a2', amount: 'Unlimited', chain: 'ethereum', riskLevel: 'high', lastUsed: '2 hours ago', contractVerified: true },
   { token: 'WETH', spender: 'Aave V3 Pool', spenderAddr: '0x87d1...3e5c', amount: '50 WETH', chain: 'ethereum', riskLevel: 'low', lastUsed: '1 day ago', contractVerified: true },
   { token: 'DAI', spender: 'Unknown Contract', spenderAddr: '0x3f2a...9d1b', amount: 'Unlimited', chain: 'ethereum', riskLevel: 'critical', lastUsed: '45 days ago', contractVerified: false },
@@ -43,7 +47,7 @@ export const TOKEN_APPROVALS = [
   { token: 'WBTC', spender: 'Suspicious DEX', spenderAddr: '0x9e4c...1a7d', amount: 'Unlimited', chain: 'ethereum', riskLevel: 'critical', lastUsed: '30 days ago', contractVerified: false },
 ]
 
-export const WHALE_MOVEMENTS = [
+export const WHALE_MOVEMENTS: WhaleMovement[] = [
   { wallet: '0x28c6...e9a1', action: 'Bought', token: 'ETH', amount: '5,200 ETH', value: '$19.98M', chain: 'ethereum', time: '2 min ago', impact: 'bullish' },
   { wallet: '0x3f8e...b2d4', action: 'Sold', token: 'SOL', amount: '125,000 SOL', value: '$23.4M', chain: 'solana', time: '8 min ago', impact: 'bearish' },
   { wallet: '0x7c2a...f1e3', action: 'Transferred', token: 'USDC', amount: '50M USDC', value: '$50M', chain: 'ethereum', time: '15 min ago', impact: 'neutral' },
@@ -54,7 +58,7 @@ export const WHALE_MOVEMENTS = [
   { wallet: '0x8b1a...d3e6', action: 'Transferred', token: 'BTC', amount: '450 BTC', value: '$44.29M', chain: 'ethereum', time: '1.5 hr ago', impact: 'neutral' },
 ]
 
-export const GAS_DATA = {
+export const GAS_DATA: GasDataRecord = {
   ethereum: { low: 12, standard: 18, fast: 25, instant: 35, unit: 'Gwei', avgTxCost: '$4.82' },
   bsc: { low: 3, standard: 5, fast: 7, instant: 10, unit: 'Gwei', avgTxCost: '$0.15' },
   polygon: { low: 30, standard: 45, fast: 80, instant: 120, unit: 'Gwei', avgTxCost: '$0.02' },
@@ -64,7 +68,7 @@ export const GAS_DATA = {
   avalanche: { low: 25, standard: 30, fast: 40, instant: 60, unit: 'nAVAX', avgTxCost: '$0.08' },
 }
 
-export const THREAT_TOKENS = [
+export const THREAT_TOKENS: ThreatToken[] = [
   { name: 'SafeMoon3.0', symbol: 'SFM3', chain: 'bsc', riskScore: 95, flags: ['Honeypot', 'Hidden Mint', 'No Audit'], holders: 1245, liquidityLocked: false, contractAge: '2 days' },
   { name: 'ElonDogAI', symbol: 'EDAI', chain: 'ethereum', riskScore: 88, flags: ['High Tax (45%)', 'Proxy Contract', 'Owner Not Renounced'], holders: 3420, liquidityLocked: false, contractAge: '5 days' },
   { name: 'MetaYield', symbol: 'MYD', chain: 'bsc', riskScore: 78, flags: ['Blacklist Function', 'Mutable Tax'], holders: 8900, liquidityLocked: true, contractAge: '12 days' },
@@ -73,7 +77,7 @@ export const THREAT_TOKENS = [
   { name: 'YieldMax Pro', symbol: 'YMP', chain: 'arbitrum', riskScore: 72, flags: ['High Tax (18%)', 'Owner Not Renounced'], holders: 5670, liquidityLocked: true, contractAge: '21 days' },
 ]
 
-export const PORTFOLIO_HISTORY = Array.from({ length: 90 }, (_, i) => {
+export const PORTFOLIO_HISTORY: PortfolioHistoryEntry[] = Array.from({ length: 90 }, (_, i) => {
   const date = new Date()
   date.setDate(date.getDate() - (89 - i))
   const base = 180000
@@ -85,7 +89,7 @@ export const PORTFOLIO_HISTORY = Array.from({ length: 90 }, (_, i) => {
   }
 })
 
-export const RISK_METRICS = {
+export const RISK_METRICS: RiskMetrics = {
   portfolioVaR: { value: -8.2, confidence: 95, period: '1 day' },
   sharpeRatio: 1.45,
   maxDrawdown: -18.3,
@@ -96,7 +100,7 @@ export const RISK_METRICS = {
   liquidationDistance: 45,
 }
 
-export const GAS_HISTORY = Array.from({ length: 24 }, (_, i) => ({
+export const GAS_HISTORY: GasHistoryEntry[] = Array.from({ length: 24 }, (_, i) => ({
   hour: `${i}:00`,
   ethereum: Math.round(10 + Math.random() * 40),
   polygon: Math.round(20 + Math.random() * 100),

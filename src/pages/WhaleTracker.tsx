@@ -1,13 +1,14 @@
 import { useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Activity, TrendingUp, TrendingDown, Minus, ArrowRight, ExternalLink } from 'lucide-react'
+import { Activity, TrendingUp, TrendingDown, Minus } from 'lucide-react'
 import Card from '../components/common/Card'
 import StatCard from '../components/common/StatCard'
 import Badge from '../components/common/Badge'
 import Header from '../components/layout/Header'
 import { useLiveWhale } from '../hooks/useLiveData'
-import { WHALE_MOVEMENTS, CHAINS } from '../data/mockData'
-import { getImpactColor, getImpactBg } from '../utils/formatters'
+import { WHALE_MOVEMENTS } from '../data/mockData'
+import { getImpactBg } from '../utils/formatters'
+import type { ReactNode } from 'react'
 
 export default function WhaleTracker() {
   const movements = useLiveWhale(WHALE_MOVEMENTS, 6000)
@@ -22,13 +23,13 @@ export default function WhaleTracker() {
     return { buys, sells, total: movements.length, volume: totalVolume }
   }, [movements])
 
-  const getActionIcon = (action) => {
+  const getActionIcon = (action: string): ReactNode => {
     if (action === 'Bought') return <TrendingUp size={14} className="text-emerald-400" />
     if (action === 'Sold') return <TrendingDown size={14} className="text-red-400" />
     return <Minus size={14} className="text-slate-400" />
   }
 
-  const getActionColor = (action) => {
+  const getActionColor = (action: string): string => {
     if (action === 'Bought' || action === 'Deposited') return 'text-emerald-400'
     if (action === 'Sold' || action === 'Withdrawn') return 'text-red-400'
     return 'text-slate-400'

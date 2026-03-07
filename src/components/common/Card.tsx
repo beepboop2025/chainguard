@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
+import type { CardProps } from '../../types'
 
-export default function Card({ children, className = '', hover = true, gradient = false, onClick }) {
+export default function Card({ children, className = '', hover = true, gradient = false, onClick }: CardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}

@@ -2,24 +2,29 @@ import { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  BarChart, Bar, Cell
 } from 'recharts'
-import { Fuel, Zap, Clock, TrendingDown, ArrowDown, ArrowUp, CheckCircle } from 'lucide-react'
+import { Fuel, Clock, TrendingDown, ArrowDown, ArrowUp, CheckCircle } from 'lucide-react'
 import Card from '../components/common/Card'
 import StatCard from '../components/common/StatCard'
-import Badge from '../components/common/Badge'
 import Header from '../components/layout/Header'
 import { useLiveGas } from '../hooks/useLiveData'
 import { GAS_DATA, GAS_HISTORY, CHAINS } from '../data/mockData'
+import type { GasTier } from '../types'
 
-const GAS_COLORS = {
+const GAS_COLORS: Record<GasTier, string> = {
   low: '#10b981',
   standard: '#3b82f6',
   fast: '#f59e0b',
   instant: '#ef4444',
 }
 
-const CustomTooltip = ({ active, payload, label }) => {
+interface GasTooltipPayload {
+  value: number
+  color: string
+  name: string
+}
+
+function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: GasTooltipPayload[]; label?: string }) {
   if (!active || !payload?.length) return null
   return (
     <div className="glass-card rounded-lg p-3 text-xs">
@@ -55,6 +60,8 @@ export default function GasOptimizer() {
   const optimalWindow = currentHour >= 2 && currentHour <= 6
     ? 'Now (off-peak hours)'
     : 'Wait for 2:00-6:00 AM UTC'
+
+  const gasTiers: GasTier[] = ['low', 'standard', 'fast', 'instant']
 
   return (
     <div>
@@ -133,7 +140,7 @@ export default function GasOptimizer() {
                   </div>
 
                   <div className="space-y-2">
-                    {['low', 'standard', 'fast', 'instant'].map(tier => (
+                    {gasTiers.map(tier => (
                       <div key={tier} className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <div className="w-2 h-2 rounded-full" style={{ background: GAS_COLORS[tier] }} />
@@ -181,11 +188,11 @@ export default function GasOptimizer() {
         <Card>
           <h3 className="text-sm font-semibold text-text-primary mb-4">Transaction Cost Estimator</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
+            {([
               { type: 'Token Transfer', gas: 21000, icon: '↗' },
               { type: 'Swap (DEX)', gas: 150000, icon: '⇄' },
               { type: 'NFT Mint', gas: 250000, icon: '◆' },
-            ].map((tx, i) => (
+            ] as const).map((tx, i) => (
               <motion.div
                 key={tx.type}
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -198,7 +205,7 @@ export default function GasOptimizer() {
                   <span className="text-sm font-medium text-text-primary">{tx.type}</span>
                 </div>
                 <div className="space-y-2">
-                  {['low', 'standard', 'fast'].map(tier => {
+                  {(['low', 'standard', 'fast'] as const).map(tier => {
                     const cost = (tx.gas * ethGas[tier] * 1e-9 * 3842).toFixed(2)
                     return (
                       <div key={tier} className="flex justify-between items-center">

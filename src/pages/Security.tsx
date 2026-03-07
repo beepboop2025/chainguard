@@ -1,17 +1,19 @@
 import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Shield, AlertTriangle, CheckCircle, XCircle, ExternalLink, Trash2, Filter } from 'lucide-react'
+import { Shield, AlertTriangle, CheckCircle, XCircle, Trash2, Filter } from 'lucide-react'
 import Card from '../components/common/Card'
 import Badge from '../components/common/Badge'
 import StatCard from '../components/common/StatCard'
 import Header from '../components/layout/Header'
-import { TOKEN_APPROVALS, CHAINS } from '../data/mockData'
-import { getRiskBg } from '../utils/formatters'
+import { TOKEN_APPROVALS } from '../data/mockData'
+import type { TokenApproval, RiskLevel } from '../types'
+
+type FilterValue = RiskLevel | 'all'
 
 export default function Security() {
-  const [approvals, setApprovals] = useState(TOKEN_APPROVALS)
-  const [filter, setFilter] = useState('all')
-  const [revoking, setRevoking] = useState(null)
+  const [approvals, setApprovals] = useState<TokenApproval[]>(TOKEN_APPROVALS)
+  const [filter, setFilter] = useState<FilterValue>('all')
+  const [revoking, setRevoking] = useState<number | null>(null)
 
   const filtered = useMemo(() => {
     if (filter === 'all') return approvals
@@ -26,13 +28,15 @@ export default function Security() {
     unverified: approvals.filter(a => !a.contractVerified).length,
   }), [approvals])
 
-  const handleRevoke = (index) => {
+  const handleRevoke = (index: number) => {
     setRevoking(index)
     setTimeout(() => {
       setApprovals(prev => prev.filter((_, i) => i !== index))
       setRevoking(null)
     }, 1500)
   }
+
+  const filterOptions: FilterValue[] = ['all', 'critical', 'high', 'medium', 'low']
 
   return (
     <div>
@@ -75,7 +79,7 @@ export default function Security() {
         {/* Filters */}
         <div className="flex items-center gap-2">
           <Filter size={14} className="text-text-muted" />
-          {['all', 'critical', 'high', 'medium', 'low'].map(f => (
+          {filterOptions.map(f => (
             <button
               key={f}
               onClick={() => setFilter(f)}
@@ -94,7 +98,7 @@ export default function Security() {
         <Card>
           <div className="space-y-2">
             <AnimatePresence mode="popLayout">
-              {filtered.map((approval, index) => {
+              {filtered.map((approval) => {
                 const originalIndex = approvals.indexOf(approval)
                 return (
                   <motion.div

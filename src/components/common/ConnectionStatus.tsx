@@ -2,14 +2,15 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Wifi, WifiOff, ChevronDown } from 'lucide-react'
 import { subscribe, getOverallStatus } from '../../services/connectionManager'
+import type { OverallStatus, FeedStatusMap, FeedStatusValue, StatusConfig } from '../../types'
 
-const STATUS_CONFIG = {
+const STATUS_CONFIG: Record<OverallStatus, StatusConfig> = {
   live: { color: 'emerald', label: 'Live', icon: Wifi },
   partial: { color: 'amber', label: 'Partial', icon: Wifi },
   offline: { color: 'red', label: 'Offline', icon: WifiOff },
 }
 
-const FEED_LABELS = {
+const FEED_LABELS: Record<string, string> = {
   prices_ws: 'Price Stream',
   prices_rest: 'Market Data',
   gas: 'Gas Prices',
@@ -18,7 +19,7 @@ const FEED_LABELS = {
   defi: 'DeFi Data',
 }
 
-const FEED_STATUS_COLORS = {
+const FEED_STATUS_COLORS: Record<FeedStatusValue, string> = {
   connected: 'bg-emerald-400',
   live: 'bg-emerald-400',
   cached: 'bg-amber-400',
@@ -29,7 +30,7 @@ const FEED_STATUS_COLORS = {
 }
 
 export default function ConnectionStatus() {
-  const [feeds, setFeeds] = useState({})
+  const [feeds, setFeeds] = useState<Partial<FeedStatusMap>>({})
   const [showDropdown, setShowDropdown] = useState(false)
 
   useEffect(() => {
@@ -38,7 +39,6 @@ export default function ConnectionStatus() {
 
   const overall = getOverallStatus()
   const config = STATUS_CONFIG[overall]
-  const Icon = config.icon
 
   return (
     <div className="relative">
@@ -61,15 +61,18 @@ export default function ConnectionStatus() {
             className="absolute right-0 top-10 w-56 glass-card rounded-xl p-3 space-y-1.5 shadow-2xl z-50"
           >
             <h4 className="text-xs font-semibold text-text-primary px-1 mb-2">Data Feeds</h4>
-            {Object.entries(FEED_LABELS).map(([key, label]) => (
-              <div key={key} className="flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-bg-primary/50">
-                <span className="text-xs text-text-secondary">{label}</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] text-text-muted capitalize">{feeds[key] || 'unknown'}</span>
-                  <div className={`w-1.5 h-1.5 rounded-full ${FEED_STATUS_COLORS[feeds[key]] || FEED_STATUS_COLORS.unknown}`} />
+            {Object.entries(FEED_LABELS).map(([key, label]) => {
+              const status = (feeds as Record<string, FeedStatusValue>)[key] ?? 'unknown'
+              return (
+                <div key={key} className="flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-bg-primary/50">
+                  <span className="text-xs text-text-secondary">{label}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-text-muted capitalize">{status}</span>
+                    <div className={`w-1.5 h-1.5 rounded-full ${FEED_STATUS_COLORS[status] ?? FEED_STATUS_COLORS.unknown}`} />
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </motion.div>
         )}
       </AnimatePresence>

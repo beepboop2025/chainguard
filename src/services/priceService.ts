@@ -1,29 +1,27 @@
 import { API_URLS, COINGECKO_IDS, COINCAP_TO_SYMBOL, COINCAP_ASSETS, CACHE_TTL } from './apiConfig'
-import { getOrFetch, cacheSet, cacheGet } from './cache'
+import { getOrFetch } from './cache'
 import { updateFeedStatus } from './connectionManager'
+import type { PriceUpdate, TokenDetail, PortfolioHistoryEntry } from '../types'
 
-let ws = null
-let reconnectTimer = null
+let ws: WebSocket | null = null
+let reconnectTimer: ReturnType<typeof setTimeout> | null = null
 let reconnectDelay = 1000
 
-// --- CoinCap WebSocket for real-time price streaming ---
-
-export function connectPriceWebSocket(onPriceUpdate) {
+export function connectPriceWebSocket(onPriceUpdate: (update: PriceUpdate) => void): () => void {
   if (ws && ws.readyState === WebSocket.OPEN) return () => disconnectWebSocket()
 
-  const connect = () => {
+  const connect = (): void => {
     try {
       ws = new WebSocket(`${API_URLS.COINCAP_WS}?assets=${COINCAP_ASSETS}`)
 
-      ws.onopen = () => {
+      ws.onopen = (): void => {
         reconnectDelay = 1000
         updateFeedStatus('prices_ws', 'connected')
       }
 
-      ws.onmessage = (event) => {
+      ws.onmessage = (event: MessageEvent): void => {
         try {
-          const data = JSON.parse(event.data)
-          // CoinCap sends: { bitcoin: "98452.12", ethereum: "3845.23", ... }
+          const data = JSON.parse(event.data as string) as Record<string, string>
           for (const [assetId, priceStr] of Object.entries(data)) {
             const symbol = COINCAP_TO_SYMBOL[assetId]
             if (symbol) {
@@ -34,12 +32,12 @@ export function connectPriceWebSocket(onPriceUpdate) {
         } catch { /* ignore malformed messages */ }
       }
 
-      ws.onclose = () => {
+      ws.onclose = (): void => {
         updateFeedStatus('prices_ws', 'reconnecting')
         scheduleReconnect(connect)
       }
 
-      ws.onerror = () => {
+      ws.onerror = (): void => {
         updateFeedStatus('prices_ws', 'reconnecting')
         ws?.close()
       }
@@ -53,27 +51,31 @@ export function connectPriceWebSocket(onPriceUpdate) {
   return () => disconnectWebSocket()
 }
 
-function scheduleReconnect(connectFn) {
-  clearTimeout(reconnectTimer)
+function scheduleReconnect(connectFn: () => void): void {
+  if (reconnectTimer !== null) clearTimeout(reconnectTimer)
   reconnectTimer = setTimeout(() => {
     reconnectDelay = Math.min(reconnectDelay * 2, 30000)
     connectFn()
   }, reconnectDelay)
 }
 
-function disconnectWebSocket() {
-  clearTimeout(reconnectTimer)
+function disconnectWebSocket(): void {
+  if (reconnectTimer !== null) clearTimeout(reconnectTimer)
   if (ws) {
-    ws.onclose = null // prevent reconnect on intentional close
+    ws.onclose = null
     ws.close()
     ws = null
   }
   updateFeedStatus('prices_ws', 'disconnected')
 }
 
-// --- CoinGecko REST for 24h change + market data ---
+interface CoinGeckoCoin {
+  usd?: number
+  usd_24h_change?: number
+  usd_market_cap?: number
+}
 
-export async function fetchTokenDetails() {
+export async function fetchTokenDetails(): Promise<Record<string, TokenDetail>> {
   const ids = Object.values(COINGECKO_IDS).join(',')
   return getOrFetch('token_details', async () => {
     const res = await fetch(
@@ -81,15 +83,14 @@ export async function fetchTokenDetails() {
       { signal: AbortSignal.timeout(10000) }
     )
     if (!res.ok) throw new Error(`CoinGecko ${res.status}`)
-    const data = await res.json()
+    const data = (await res.json()) as Record<string, CoinGeckoCoin>
 
-    // Transform: { bitcoin: { usd: 98420, usd_24h_change: 1.12 } } → { BTC: { price, change24h } }
-    const result = {}
+    const result: Record<string, TokenDetail> = {}
     for (const [symbol, geckoId] of Object.entries(COINGECKO_IDS)) {
       const coin = data[geckoId]
       if (coin) {
         result[symbol] = {
-          price: coin.usd,
+          price: coin.usd ?? 0,
           change24h: coin.usd_24h_change ?? 0,
           marketCap: coin.usd_market_cap ?? 0,
         }
@@ -100,20 +101,16 @@ export async function fetchTokenDetails() {
   }, CACHE_TTL.PRICES_REST)
 }
 
-// --- CoinGecko REST for historical price chart ---
-
-export async function fetchPriceHistory(days = 90) {
+export async function fetchPriceHistory(days: number = 90): Promise<PortfolioHistoryEntry[]> {
   return getOrFetch(`price_history_${days}`, async () => {
-    // Fetch ETH + BTC to approximate total portfolio trend
     const res = await fetch(
       `${API_URLS.COINGECKO}/coins/ethereum/market_chart?vs_currency=usd&days=${days}&interval=daily`,
       { signal: AbortSignal.timeout(10000) }
     )
     if (!res.ok) throw new Error(`CoinGecko history ${res.status}`)
-    const data = await res.json()
+    const data = (await res.json()) as { prices: [number, number][] }
 
-    // Transform: { prices: [[timestamp, price], ...] } → [{ date: 'Mar 15', value: 3842 }]
-    return data.prices.map(([ts, price]) => {
+    return data.prices.map(([ts, price]): PortfolioHistoryEntry => {
       const d = new Date(ts)
       return {
         date: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),

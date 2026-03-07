@@ -1,5 +1,6 @@
-// CoinGecko coin IDs mapped to app token symbols
-export const COINGECKO_IDS = {
+import type { OwlracleChainConfig } from '../types'
+
+export const COINGECKO_IDS: Record<string, string> = {
   ETH: 'ethereum',
   BTC: 'bitcoin',
   SOL: 'solana',
@@ -12,16 +13,13 @@ export const COINGECKO_IDS = {
   OP: 'optimism',
 }
 
-// Reverse map: CoinGecko ID → app symbol
-export const COINGECKO_TO_SYMBOL = Object.fromEntries(
+export const COINGECKO_TO_SYMBOL: Record<string, string> = Object.fromEntries(
   Object.entries(COINGECKO_IDS).map(([sym, id]) => [id, sym])
 )
 
-// CoinCap uses lowercase names as asset IDs
-export const COINCAP_ASSETS = Object.values(COINGECKO_IDS).join(',')
+export const COINCAP_ASSETS: string = Object.values(COINGECKO_IDS).join(',')
 
-// CoinCap asset ID → app symbol
-export const COINCAP_TO_SYMBOL = {
+export const COINCAP_TO_SYMBOL: Record<string, string> = {
   bitcoin: 'BTC',
   ethereum: 'ETH',
   solana: 'SOL',
@@ -34,19 +32,16 @@ export const COINCAP_TO_SYMBOL = {
   optimism: 'OP',
 }
 
-// Owlracle chain slugs
-export const OWLRACLE_CHAINS = {
+export const OWLRACLE_CHAINS: Record<string, OwlracleChainConfig> = {
   ethereum: { slug: 'eth', unit: 'Gwei' },
   bsc: { slug: 'bsc', unit: 'Gwei' },
   polygon: { slug: 'poly', unit: 'Gwei' },
   arbitrum: { slug: 'arb', unit: 'Gwei' },
   avalanche: { slug: 'avax', unit: 'nAVAX' },
   base: { slug: 'base', unit: 'Gwei' },
-  // Solana not supported by Owlracle — use mock fallback
 }
 
-// GoPlus chain IDs
-export const GOPLUS_CHAIN_IDS = {
+export const GOPLUS_CHAIN_IDS: Record<string, string> = {
   ethereum: '1',
   bsc: '56',
   polygon: '137',
@@ -55,8 +50,7 @@ export const GOPLUS_CHAIN_IDS = {
   avalanche: '43114',
 }
 
-// Blockchair chain names
-export const BLOCKCHAIR_CHAINS = ['bitcoin', 'ethereum']
+export const BLOCKCHAIR_CHAINS: string[] = ['bitcoin', 'ethereum']
 
 export const API_URLS = {
   COINCAP_WS: 'wss://ws.coincap.io/prices',
@@ -67,9 +61,8 @@ export const API_URLS = {
   DEFILLAMA: 'https://api.llama.fi',
   DEFILLAMA_YIELDS: 'https://yields.llama.fi',
   BLOCKCHAIR: 'https://api.blockchair.com',
-}
+} as const
 
-// Cache TTLs in ms
 export const CACHE_TTL = {
   PRICES_REST: 120_000,
   PRICE_HISTORY: 300_000,
@@ -77,4 +70,4 @@ export const CACHE_TTL = {
   GOPLUS: 300_000,
   DEFILLAMA: 120_000,
   WHALES: 300_000,
-}
+} as const

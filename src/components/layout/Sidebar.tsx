@@ -2,11 +2,12 @@ import { NavLink } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   LayoutDashboard, Shield, Activity, Fuel, AlertTriangle,
-  Wallet, Settings, ChevronLeft, ChevronRight
+  Wallet, ChevronLeft, ChevronRight
 } from 'lucide-react'
 import { useState } from 'react'
+import type { NavItem } from '../../types'
 
-const navItems = [
+const navItems: NavItem[] = [
   { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { path: '/security', icon: Shield, label: 'Security' },
   { path: '/whales', icon: Activity, label: 'Whale Tracker' },

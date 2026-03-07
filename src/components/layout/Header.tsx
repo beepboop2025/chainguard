@@ -2,8 +2,9 @@ import { Bell, Search } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import ConnectionStatus from '../common/ConnectionStatus'
+import type { HeaderProps, Alert } from '../../types'
 
-export default function Header({ title, subtitle }) {
+export default function Header({ title, subtitle }: HeaderProps) {
   const [alertCount] = useState(3)
   const [showAlerts, setShowAlerts] = useState(false)
   const [time, setTime] = useState(new Date())
@@ -13,7 +14,7 @@ export default function Header({ title, subtitle }) {
     return () => clearInterval(timer)
   }, [])
 
-  const alerts = [
+  const alerts: Alert[] = [
     { type: 'critical', msg: 'Unlimited approval to unverified contract detected', time: '2m ago' },
     { type: 'warning', msg: 'Whale sold 125K SOL ($23.4M)', time: '8m ago' },
     { type: 'info', msg: 'ETH gas dropped below 15 Gwei - optimal window', time: '12m ago' },
