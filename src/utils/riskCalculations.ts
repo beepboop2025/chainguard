@@ -31,6 +31,7 @@ export function getOverallRiskLevel(score: number): OverallRiskInfo {
 
 export function calculateConcentrationRisk(tokens: PortfolioToken[]): number {
   const total = tokens.reduce((sum, t) => sum + t.allocation, 0)
+  if (total === 0) return 0
   const hhi = tokens.reduce((sum, t) => sum + Math.pow((t.allocation / total) * 100, 2), 0)
   return Math.min(100, hhi / 100)
 }

@@ -64,7 +64,8 @@ function transformGoPlusResult(token: GoPlusTokenData, address: string, chainId:
     riskScore += 20
   }
 
-  if (token.can_take_back_ownership === '1' || token.owner_address !== '') {
+  const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
+  if (token.can_take_back_ownership === '1' || (token.owner_address !== '' && token.owner_address !== ZERO_ADDR)) {
     flags.push('Owner Not Renounced')
     riskScore += 10
   }
@@ -124,8 +125,17 @@ function transformGoPlusResult(token: GoPlusTokenData, address: string, chainId:
   }
 }
 
-export function detectChainId(input: string): string {
+export function detectChainId(input: string, explicitChain?: string): string {
+  if (explicitChain) {
+    const explicit = GOPLUS_CHAIN_IDS[explicitChain.toLowerCase()]
+    if (explicit) return explicit
+  }
   const lower = input.toLowerCase()
+  // Tron addresses start with T
+  if (lower.startsWith('t')) return GOPLUS_CHAIN_IDS['tron'] ?? '1'
+  // Solana addresses are base58, typically 32-44 chars, no 0x prefix
+  if (!lower.startsWith('0x') && lower.length >= 32 && lower.length <= 44) return GOPLUS_CHAIN_IDS['solana'] ?? '1'
+  // Default EVM: Ethereum mainnet
   if (lower.startsWith('0x')) return '1'
   return '1'
 }

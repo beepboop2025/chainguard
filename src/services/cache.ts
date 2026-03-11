@@ -1,5 +1,6 @@
 import type { CacheEntry, CacheResult } from '../types'
 
+const MAX_SIZE = 100
 const store = new Map<string, CacheEntry<unknown>>()
 
 export function cacheGet<T>(key: string): CacheResult<T> | null {
@@ -10,6 +11,11 @@ export function cacheGet<T>(key: string): CacheResult<T> | null {
 }
 
 export function cacheSet<T>(key: string, data: T, ttlMs: number): void {
+  if (store.size >= MAX_SIZE && !store.has(key)) {
+    // Delete the oldest entry (first key in insertion order)
+    const oldestKey = store.keys().next().value
+    if (oldestKey !== undefined) store.delete(oldestKey)
+  }
   store.set(key, { data, expiresAt: Date.now() + ttlMs, setAt: Date.now() })
 }
 

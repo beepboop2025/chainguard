@@ -59,7 +59,7 @@ async function fetchBlockchairWhales(): Promise<WhaleMovement[]> {
         token: 'BTC',
         amount: `${valueBtc.toFixed(2)} BTC`,
         value: formatValue(valueUsd),
-        chain: 'ethereum',
+        chain: 'bitcoin',
         time: timeAgo(tx.time ?? ''),
         impact: 'neutral' as Impact,
       }

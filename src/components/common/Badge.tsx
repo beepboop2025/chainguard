@@ -1,17 +1,21 @@
 import type { BadgeProps, BadgeVariant } from '../../types'
 
-const variants: Record<BadgeVariant, string> = {
-  default: 'bg-slate-700/50 text-slate-300 border-slate-600/30',
-  success: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-  warning: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-  danger: 'bg-red-500/10 text-red-400 border-red-500/20',
-  info: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-  purple: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
+const variants: Record<BadgeVariant, { classes: string; glow: string }> = {
+  default: { classes: 'bg-slate-500/8 text-slate-300 border-slate-500/12', glow: 'none' },
+  success: { classes: 'bg-emerald-500/8 text-emerald-400 border-emerald-500/12', glow: '0 0 8px rgba(16, 185, 129, 0.08)' },
+  warning: { classes: 'bg-amber-500/8 text-amber-400 border-amber-500/12', glow: '0 0 8px rgba(245, 158, 11, 0.08)' },
+  danger: { classes: 'bg-red-500/8 text-red-400 border-red-500/12', glow: '0 0 8px rgba(239, 68, 68, 0.08)' },
+  info: { classes: 'bg-blue-500/8 text-blue-400 border-blue-500/12', glow: '0 0 8px rgba(59, 130, 246, 0.08)' },
+  purple: { classes: 'bg-purple-500/8 text-purple-400 border-purple-500/12', glow: '0 0 8px rgba(139, 92, 246, 0.08)' },
 }
 
 export default function Badge({ children, variant = 'default', className = '' }: BadgeProps) {
+  const v = variants[variant]
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${variants[variant]} ${className}`}>
+    <span
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium border backdrop-blur-sm transition-all duration-300 hover:scale-105 ${v.classes} ${className}`}
+      style={{ boxShadow: v.glow }}
+    >
       {children}
     </span>
   )

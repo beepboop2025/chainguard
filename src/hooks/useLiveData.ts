@@ -72,19 +72,19 @@ export function useLiveGas(initialData: GasDataRecord, interval = 5000): GasData
   return data
 }
 
+const WHALE_TOKENS = ['ETH', 'BTC', 'SOL', 'ARB', 'LINK', 'AAVE', 'UNI', 'AVAX']
+const WHALE_ACTIONS = ['Bought', 'Sold', 'Transferred', 'Deposited', 'Withdrawn']
+const WHALE_IMPACTS: Impact[] = ['bullish', 'bearish', 'neutral']
+const WHALE_CHAINS = ['ethereum', 'solana', 'arbitrum', 'base', 'polygon']
+
 // Whale movements: real API data blended with simulated movements
 export function useLiveWhale(initialData: WhaleMovement[], interval = 8000): WhaleMovement[] {
   const [data, setData] = useState<WhaleMovement[]>(initialData)
 
-  const tokens = ['ETH', 'BTC', 'SOL', 'ARB', 'LINK', 'AAVE', 'UNI', 'AVAX']
-  const actions = ['Bought', 'Sold', 'Transferred', 'Deposited', 'Withdrawn']
-  const impacts: Impact[] = ['bullish', 'bearish', 'neutral']
-  const chains = ['ethereum', 'solana', 'arbitrum', 'base', 'polygon']
-
   // Keep simulated generator as fallback / filler between real data
   const generateMovement = useCallback((): WhaleMovement => {
-    const token = tokens[Math.floor(Math.random() * tokens.length)]
-    const action = actions[Math.floor(Math.random() * actions.length)]
+    const token = WHALE_TOKENS[Math.floor(Math.random() * WHALE_TOKENS.length)]
+    const action = WHALE_ACTIONS[Math.floor(Math.random() * WHALE_ACTIONS.length)]
     const value = Math.round(Math.random() * 50 + 5)
     const hash = Math.random().toString(16).slice(2, 6)
     const hash2 = Math.random().toString(16).slice(2, 6)
@@ -94,9 +94,9 @@ export function useLiveWhale(initialData: WhaleMovement[], interval = 8000): Wha
       token,
       amount: `${(Math.random() * 10000 + 100).toFixed(0)} ${token}`,
       value: `$${value}M`,
-      chain: chains[Math.floor(Math.random() * chains.length)],
+      chain: WHALE_CHAINS[Math.floor(Math.random() * WHALE_CHAINS.length)],
       time: 'Just now',
-      impact: action === 'Bought' ? 'bullish' : action === 'Sold' ? 'bearish' : impacts[Math.floor(Math.random() * impacts.length)],
+      impact: action === 'Bought' ? 'bullish' : action === 'Sold' ? 'bearish' : WHALE_IMPACTS[Math.floor(Math.random() * WHALE_IMPACTS.length)],
     }
   }, [])
 

@@ -10,6 +10,8 @@ let reconnectDelay = 1000
 export function connectPriceWebSocket(onPriceUpdate: (update: PriceUpdate) => void): () => void {
   if (ws && ws.readyState === WebSocket.OPEN) return () => disconnectWebSocket()
 
+  reconnectDelay = 1000
+
   const connect = (): void => {
     try {
       ws = new WebSocket(`${API_URLS.COINCAP_WS}?assets=${COINCAP_ASSETS}`)

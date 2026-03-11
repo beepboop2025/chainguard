@@ -1,6 +1,7 @@
 import type { RiskLevel, Impact } from '../types'
 
 export function formatCurrency(value: number, decimals: number = 2): string {
+  if (!Number.isFinite(value)) return '$0.00'
   if (value >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(2)}B`
   if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(2)}M`
   if (value >= 1_000) return `$${(value / 1_000).toFixed(decimals)}K`
@@ -8,6 +9,7 @@ export function formatCurrency(value: number, decimals: number = 2): string {
 }
 
 export function formatNumber(value: number, decimals: number = 2): string {
+  if (!Number.isFinite(value)) return '0.00'
   if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(decimals)}M`
   if (value >= 1_000) return `${(value / 1_000).toFixed(decimals)}K`
   return value.toFixed(decimals)
