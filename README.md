@@ -1,3 +1,8 @@
+<!-- textura-banner -->
+<div align="center">
+  <a href="https://github.com/beepboop2025/chainguard"><img src="./banner.svg" width="100%" alt="chainguard" /></a>
+</div>
+
 # ChainGuard
 
 **Crypto portfolio security dashboard with real-time risk intelligence across seven chains.**
