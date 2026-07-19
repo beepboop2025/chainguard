@@ -11,7 +11,7 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue.svg)
 ![Vite](https://img.shields.io/badge/Vite-7-purple.svg)
 ![Tailwind](https://img.shields.io/badge/Tailwind-4-38bdf8.svg)
-![License](https://img.shields.io/badge/License-MIT-green.svg)
+![License](https://img.shields.io/badge/License-Source--Available-orange.svg)
 
 ChainGuard is a single-page dashboard for monitoring DeFi portfolio risk in real time. It streams live prices over WebSocket, scores smart contracts for rug-pull indicators, tracks whale movements, compares gas costs across chains, and manages token approvals -- all from six free public APIs with zero configuration.
 
@@ -108,4 +108,4 @@ src/
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+Source-available — free to view, study, and run locally for non-commercial use. Commercial use requires a separate license. See [LICENSE.md](LICENSE.md) for the full terms.
